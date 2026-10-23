@@ -1,0 +1,42 @@
+name: Build and release deck
+
+# Runs when a release is published (from the GitHub website or the API),
+# so students only ever receive a deck that has been tested.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install genanki
+        run: pip install -r requirements.txt
+
+      - name: Build deck
+        run: bash build.sh
+
+      - name: Check the deck was built
+        run: test -s dist/IB_Math_AA_HL.apkg
+
+      - name: Keep a copy on the workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: IB_Math_AA_HL
+          path: dist/IB_Math_AA_HL.apkg
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/IB_Math_AA_HL.apkg

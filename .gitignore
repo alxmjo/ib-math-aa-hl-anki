@@ -1,0 +1,3 @@
+*.apkg
+dist/
+__pycache__/
