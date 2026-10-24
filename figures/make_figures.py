@@ -43,13 +43,13 @@ def right_angle(v, a, b, s=9):
     return poly([p1, p2, p3], closed=False)
 
 
-def arc(c, r, a1, a2, acc=False):
+def arc(c, r, a1, a2, acc=False, w=1.4):
     """Arc counterclockwise (maths convention, y up) from angle a1 to a2 in degrees."""
     span = (a2 - a1) % 360
     x1, y1 = c[0] + r * math.cos(math.radians(a1)), c[1] - r * math.sin(math.radians(a1))
     x2, y2 = c[0] + r * math.cos(math.radians(a2)), c[1] - r * math.sin(math.radians(a2))
     large = 1 if span > 180 else 0
-    s = f'<path d="M {f(x1)} {f(y1)} A {r} {r} 0 {large} 0 {f(x2)} {f(y2)}" fill="none" stroke="{ACC if acc else "currentColor"}" stroke-width="1.4"'
+    s = f'<path d="M {f(x1)} {f(y1)} A {r} {r} 0 {large} 0 {f(x2)} {f(y2)}" fill="none" stroke="{ACC if acc else "currentColor"}" stroke-width="{w}"'
     if acc: s += ' class="acc"'
     return s + "/>"
 
@@ -86,6 +86,25 @@ def north(p, length=60):
     top = (p[0], p[1] - length)
     return (line(p, top, dash=True) + poly([(top[0], top[1] - 7), (top[0] - 4, top[1] + 1), (top[0] + 4, top[1] + 1)])
             + text(top[0], top[1] - 11, "N"))
+
+
+def circle(c, r):
+    return f'<circle cx="{f(c[0])}" cy="{f(c[1])}" r="{r}" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+
+
+def pt(c, r, a):
+    """Point at angle a (degrees, anticlockwise from the positive x-axis) on the circle centre c, radius r."""
+    return (c[0] + r * math.cos(math.radians(a)), c[1] - r * math.sin(math.radians(a)))
+
+
+def axes(c, r, extra=22):
+    return (line((c[0] - r - extra, c[1]), (c[0] + r + extra, c[1]), w=1.2) + line((c[0], c[1] + r + extra), (c[0], c[1] - r - extra), w=1.2)
+            + text(c[0] + r + extra + 4, c[1] + 5, "x", anchor="start", italic=True, size=13)
+            + text(c[0] + 6, c[1] - r - extra + 4, "y", anchor="start", italic=True, size=13))
+
+
+def unit_circle(c, r):
+    return axes(c, r) + circle(c, r)
 
 
 def svg(w, h, body):
@@ -178,6 +197,102 @@ FIGS["1.7-F01"] = svg(240, 145, poly([P(15, 132), P(170, 132), P(225, 82), P(70,
     + arc(A, 34, ang(A, N), ang(A, Pp), acc=True) + angle_label(A, 47, ang(A, N), ang(A, Pp), "θ", italic=True, acc=True)
     + dot(A) + dot(N) + text(A[0] - 8, A[1] + 4, "A", anchor="end") + text(Pp[0] + 6, Pp[1] + 4, "P", anchor="start")
     + text(N[0] + 7, N[1] + 12, "N", anchor="start"))
+
+
+# ---------- Chapter 1.8 ----------
+# 1.8-A01: one radian
+O, r = P(110, 85), 60
+A, B = pt(O, r, -28.65), pt(O, r, 28.65)
+FIGS["1.8-A01"] = svg(220, 170, circle(O, r) + line(O, A) + line(O, B) + arc(O, r, -28.65, 28.65, acc=True, w=3)
+    + arc(O, 16, -28.65, 28.65) + text(O[0] + 21, O[1] + 4, "1 rad", anchor="start", size=12) + dot(O)
+    + text(O[0] + 24, O[1] - 26, "r", italic=True) + text(O[0] + 24, O[1] + 35, "r", italic=True)
+    + text(O[0] + r + 8, O[1] + 5, "r", italic=True, acc=True, anchor="start") + text(O[0] - 8, O[1] + 5, "O", anchor="end"))
+
+# 1.8-C01: cos and sin as coordinates
+O, r = P(155, 95), 65; Pp = pt(O, r, 140)
+FIGS["1.8-C01"] = svg(280, 185, unit_circle(O, r) + line(O, Pp, acc=True) + line(Pp, (Pp[0], O[1]), dash=True) + line(Pp, (O[0], Pp[1]), dash=True)
+    + arc(O, 16, 0, 140, acc=True) + angle_label(O, 28, 0, 140, "θ", italic=True, acc=True) + dot(Pp)
+    + text(Pp[0] - 6, Pp[1] - 8, "P(cos θ, sin θ)", anchor="end", size=12)
+    + text(Pp[0], O[1] + 16, "cos θ", size=12) + text(O[0] + 6, Pp[1] + 4, "sin θ", anchor="start", size=12)
+    + text(O[0] + r + 3, O[1] + 16, "1", anchor="start", size=12))
+
+# 1.8-C02: which ratios are positive in each quadrant
+O, r = P(130, 85), 60
+FIGS["1.8-C02"] = svg(260, 175, axes(O, r)
+    + text(O[0] + 40, O[1] - 30, "All", acc=True) + text(O[0] - 40, O[1] - 30, "sin", acc=True)
+    + text(O[0] - 40, O[1] + 40, "tan", acc=True) + text(O[0] + 40, O[1] + 40, "cos", acc=True)
+    + text(O[0] + 40, O[1] - 48, "1st", size=11) + text(O[0] - 40, O[1] - 48, "2nd", size=11)
+    + text(O[0] - 40, O[1] + 22, "3rd", size=11) + text(O[0] + 40, O[1] + 22, "4th", size=11))
+
+# 1.8-C04: supplementary angles (reflection in the y-axis)
+O, r, t = P(150, 100), 62, 40; Pp, Q = pt(O, r, t), pt(O, r, 180 - t)
+FIGS["1.8-C04"] = svg(300, 180, unit_circle(O, r) + line(O, Pp, acc=True) + line(O, Q, acc=True) + line(Q, Pp, dash=True)
+    + arc(O, 14, 0, t) + angle_label(O, 26, 0, t, "θ", italic=True, size=12)
+    + arc(O, 22, 0, 180 - t) + angle_label(O, 40, 110, 140, "π − θ", size=12)
+    + dot(Pp) + dot(Q) + text(Pp[0] + 6, Pp[1] - 6, "(cos θ, sin θ)", anchor="start", size=11)
+    + text(Q[0] - 6, Q[1] - 6, "(−cos θ, sin θ)", anchor="end", size=11))
+
+# 1.8-C05: negative angles (reflection in the x-axis)
+O, r, t = P(130, 92), 60, 35; Pp, Q = pt(O, r, t), pt(O, r, -t)
+FIGS["1.8-C05"] = svg(300, 185, unit_circle(O, r) + line(O, Pp, acc=True) + line(O, Q, acc=True) + line(Pp, Q, dash=True)
+    + arc(O, 16, 0, t) + angle_label(O, 29, 0, t, "θ", italic=True, size=12)
+    + arc(O, 16, -t, 0) + angle_label(O, 31, -t, 0, "−θ", size=12)
+    + dot(Pp) + dot(Q) + text(Pp[0] + 6, Pp[1] - 6, "(cos θ, sin θ)", anchor="start", size=11)
+    + text(Q[0] + 6, Q[1] + 14, "(cos θ, −sin θ)", anchor="start", size=11))
+
+# 1.8-D16: the two special triangles
+A, B, C = P(20, 125), P(110, 125), P(110, 35)
+D, E, F = P(165, 125), P(217, 125), P(217, 35)
+FIGS["1.8-D16"] = svg(260, 150, poly([A, B, C]) + right_angle(B, A, C) + arc(A, 26, 0, 45) + angle_label(A, 42, 0, 45, "π/4", size=11)
+    + arc(C, 22, 225, 270) + angle_label(C, 38, 225, 270, "π/4", size=11)
+    + text(65, 142, "1") + text(118, 85, "1", anchor="start") + text(56, 72, "√2", anchor="end")
+    + poly([D, E, F]) + right_angle(E, D, F) + arc(D, 20, 0, ang(D, F)) + angle_label(D, 36, 0, ang(D, F), "π/3", size=11)
+    + arc(F, 24, ang(F, D), 270) + angle_label(F, 42, ang(F, D), 270, "π/6", size=11)
+    + text(191, 142, "1") + text(225, 85, "√3", anchor="start") + text(183, 75, "2", anchor="end"))
+
+# 1.8-D17: reference angle for 4π/3
+O, r = P(140, 92), 62; Pp = pt(O, r, 240)
+FIGS["1.8-D17"] = svg(260, 180, unit_circle(O, r) + line(O, Pp, acc=True) + line(Pp, (Pp[0], O[1]), dash=True)
+    + arc(O, 14, 0, 240) + angle_label(O, 28, 0, 240, "4π/3", size=11)
+    + arc(O, 30, 180, 240, acc=True) + angle_label(O, 50, 180, 220, "π/3", acc=True, size=11)
+    + dot(Pp) + text(Pp[0] - 6, Pp[1] + 12, "P", anchor="end"))
+
+# 1.8-D18: points at the quadrantal angles
+O, r = P(140, 95), 60
+FIGS["1.8-D18"] = svg(280, 185, unit_circle(O, r) + "".join(dot(pt(O, r, a)) for a in (0, 90, 180, 270))
+    + text(O[0] + r + 4, O[1] + 16, "(1, 0)", anchor="start", size=12) + text(O[0] - 6, O[1] - r - 6, "(0, 1)", anchor="end", size=12)
+    + text(O[0] - r - 4, O[1] + 16, "(−1, 0)", anchor="end", size=12) + text(O[0] + 6, O[1] + r + 15, "(0, −1)", anchor="start", size=12))
+
+# 1.8-F01: sin θ = k, solutions α and π − α
+O, r, a = P(140, 95), 60, 30; P1, P2 = pt(O, r, a), pt(O, r, 180 - a)
+FIGS["1.8-F01"] = svg(280, 180, unit_circle(O, r) + line((O[0] - r - 18, P1[1]), (O[0] + r + 18, P1[1]), acc=True, dash=True)
+    + text(O[0] + r + 20, P1[1] - 4, "y = k", anchor="start", italic=True, acc=True, size=12)
+    + line(O, P1) + line(O, P2) + dot(P1) + dot(P2)
+    + arc(O, 14, 0, a) + angle_label(O, 26, 0, a, "α", italic=True, size=12)
+    + arc(O, 20, 0, 180 - a) + angle_label(O, 50, 0, 180 - a, "π − α", size=12))
+
+# 1.8-F02: cos θ = k, solutions α and 2π − α
+O, r, a = P(130, 95), 60, 50; P1, P2 = pt(O, r, a), pt(O, r, -a)
+FIGS["1.8-F02"] = svg(270, 185, unit_circle(O, r) + line((P1[0], O[1] - r - 18), (P1[0], O[1] + r + 18), acc=True, dash=True)
+    + text(P1[0] + 6, O[1] - r - 8, "x = k", anchor="start", italic=True, acc=True, size=12)
+    + line(O, P1) + line(O, P2) + dot(P1) + dot(P2)
+    + arc(O, 14, 0, a) + angle_label(O, 27, 0, a, "α", italic=True, size=12)
+    + arc(O, 20, 0, 360 - a) + angle_label(O, 40, 0, 360 - a, "2π − α", size=12))
+
+# 1.8-F03: tan θ = k, solutions α and π + α
+O, r, a = P(130, 95), 60, 40; P1, P2 = pt(O, r, a), pt(O, r, 180 + a)
+FIGS["1.8-F03"] = svg(260, 185, unit_circle(O, r) + line(P2, P1, acc=True) + dot(P1) + dot(P2)
+    + arc(O, 14, 0, a) + angle_label(O, 27, 0, a, "α", italic=True, size=12)
+    + arc(O, 22, 0, 180 + a) + angle_label(O, 40, 0, 180 + a, "π + α", size=12))
+
+# 1.8-G01: gradient of a line is tan θ
+X = P(95, 125); t = 35; m = math.tan(math.radians(t))
+FIGS["1.8-G01"] = svg(260, 170, line(P(15, 125), P(245, 125), w=1.2) + line(P(55, 160), P(55, 15), w=1.2)
+    + text(248, 130, "x", anchor="start", italic=True, size=13) + text(61, 19, "y", anchor="start", italic=True, size=13)
+    + line(P(40, 125 + 55 * m), P(235, 125 - 140 * m), acc=True)
+    + line(X, P(185, 125), dash=True) + line(P(185, 125), P(185, 125 - 90 * m), dash=True) + right_angle(P(185, 125), X, P(185, 50), 7)
+    + arc(X, 24, 0, t, acc=True) + angle_label(X, 38, 0, t, "θ", italic=True, acc=True)
+    + text(140, 142, "run", size=12) + text(191, 125 - 45 * m + 4, "rise", anchor="start", size=12))
 
 if __name__ == "__main__":
     for name, s in FIGS.items():

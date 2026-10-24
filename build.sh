@@ -9,4 +9,5 @@ python3 build_math_deck.py --out dist/IB_Math_AA_HL.apkg \
   --csv csv/1.4_equations.csv          --ref 1.4 --name "Equations" \
   --csv csv/1.5_sequences_series.csv   --ref 1.5 --name "Sequences and Series" \
   --csv csv/1.6_measurement.csv        --ref 1.6 --name "Measurement" \
-  --csv csv/1.7_right_angled_trig.csv  --ref 1.7 --name "Right Angled Triangle Trigonometry"
+  --csv csv/1.7_right_angled_trig.csv  --ref 1.7 --name "Right Angled Triangle Trigonometry" \
+  --csv csv/1.8_unit_circle_radians.csv --ref 1.8 --name "The Unit Circle and Radian Measure"
