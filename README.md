@@ -16,13 +16,13 @@ The link always gives the newest version. Bookmark it.
 - **iPhone or iPad (AnkiMobile):** tap the link in Safari, open the download, tap Share and choose AnkiMobile.
 - **Computer (Anki):** download the file, then use File → Import, or double-click the file.
 
-If the import screen offers **Import any deck presets**, turn it on the first time. This sets the deck to 10 new cards per day.
+If the import screen offers **Import any deck presets**, turn it on every time. This sets each chapter to 10 new cards per day, including chapters added in later updates. It never overwrites changes you have made to your own deck options.
 
 The cards appear under **IB Math AA HL**, with one subdeck per chapter.
 
 ### Updating
 
-When a new version is announced, download from the same link and import it the same way. Keep the import options at their defaults. Edited cards update in place and your review progress is kept.
+When a new version is announced, download from the same link and import it the same way, with **Import any deck presets** turned on and the other import options at their defaults. Edited cards update in place and your review progress is kept.
 
 ### Removing retired cards
 
