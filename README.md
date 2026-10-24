@@ -2,6 +2,17 @@
 
 Anki flashcards for IB Mathematics: Analysis and Approaches HL, one subdeck per textbook chapter.
 
+## Chapters
+
+The deck currently covers these textbook chapters. The code gives the book and chapter, so 1.4 is Book 1, Chapter 4.
+
+| Code | Chapter | Cards |
+|---|---|---|
+| 1.4 | Equations | 15 |
+| 1.5 | Sequences and Series | 18 |
+
+Each chapter is a subdeck under **IB Math AA HL**. New chapters are added in later updates.
+
 ## For students
 
 ### Download
@@ -34,6 +45,7 @@ Importing never deletes cards. When a card is retired, the release notes give a 
 
 - `csv/` holds one file per chapter, with the columns id, section, type, front, back, extra, tags, active.
 - `build.sh` holds the build command for every chapter and writes `dist/IB_Math_AA_HL.apkg`.
+- When a chapter is added, or a card is added or retired, update the Chapters table at the top of this README.
 - `build_math_deck.py` is the builder (genanki).
 - `.github/workflows/release.yml` builds the deck and attaches it to each published release.
 
