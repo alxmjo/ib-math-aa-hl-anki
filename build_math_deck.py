@@ -13,8 +13,9 @@ CSV columns: id, section, type, front, back, extra, tags, active
   maths = \( ... \) inline, \[ ... \] display;  HTML allowed (<br>, <b>)
 Cloze cards: put the text with {{c1::...}} in the front column and leave back empty.
   They use the "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
+Figures: write [fig:NAME] in any field; the builder inlines figures/NAME.svg (see figures/make_figures.py).
 """
-import argparse, csv, hashlib, json, os, shutil, sqlite3, zipfile
+import argparse, csv, hashlib, json, os, re, shutil, sqlite3, zipfile
 import genanki
 
 DECK_ROOT = "IB Math AA HL"
@@ -46,7 +47,23 @@ text-align:center;color:#222;background:#fff;padding:0 8px}
 .extra{text-align:left;display:inline-block;max-width:100%}
 mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
 .cloze{font-weight:bold;color:#1a5fb4}
-.nightMode .cloze{color:#8ab4f8}"""
+.nightMode .cloze{color:#8ab4f8}
+.fig{margin:10px auto 4px;text-align:center}
+.fig svg{width:240px;max-width:100%;height:auto}
+.nightMode .fig .acc{stroke:#8ab4f8}
+.nightMode .fig .acct{fill:#8ab4f8}"""
+
+
+FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
+
+
+def with_figures(text, card_id):
+    def inline(m):
+        path = os.path.join(FIG_DIR, m.group(1) + ".svg")
+        if not os.path.exists(path):
+            raise SystemExit(f"{card_id}: figure {m.group(1)} not found in figures/")
+        return '<div class="fig">' + open(path, encoding="utf-8").read().strip() + "</div>"
+    return re.sub(r"\[fig:([\w.\-]+)\]", inline, text)
 
 
 def deck_id(name):
@@ -97,6 +114,8 @@ def main():
                 continue
             guid = genanki.guid_for(prefix, r["id"])
             label, card_id = f'{ref}{r["section"]}', f'{prefix}-{r["id"]}'
+            for fld in ("front", "back", "extra"):
+                r[fld] = with_figures(r[fld], card_id)
             if "{{c1::" in r["front"]:
                 if r["back"].strip():
                     raise SystemExit(f"{card_id}: a cloze card must leave the back column empty")
