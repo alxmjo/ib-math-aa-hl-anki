@@ -19,7 +19,7 @@ Each chapter is a subdeck under **IB Math AA HL**. New chapters are added in lat
 
 **[Download the latest deck](https://github.com/alxmjo/ib-math-aa-hl-anki/releases/latest/download/IB_Math_AA_HL.apkg)**
 
-The link always gives the newest version. Bookmark it.
+The link always gives the newest version. Might be worth bookmarking. 
 
 ### First import
 
