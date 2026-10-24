@@ -13,6 +13,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 | 1.6 | Measurement | 14 |
 | 1.7 | Right Angled Triangle Trigonometry | 19 |
 | 1.8 | The Unit Circle and Radian Measure | 41 |
+| 1.9 | Non-Right Angled Triangle Trigonometry | 12 |
 
 Each chapter is a subdeck under **IB Math AA HL**. New chapters are added in later updates.
 

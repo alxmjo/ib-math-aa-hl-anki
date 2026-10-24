@@ -294,6 +294,58 @@ FIGS["1.8-G01"] = svg(260, 170, line(P(15, 125), P(245, 125), w=1.2) + line(P(55
     + arc(X, 24, 0, t, acc=True) + angle_label(X, 38, 0, t, "θ", italic=True, acc=True)
     + text(140, 142, "run", size=12) + text(191, 125 - 45 * m + 4, "rise", anchor="start", size=12))
 
+
+# ---------- Chapter 1.9 ----------
+# 1.9-A01: labelling convention, side a opposite angle A
+A, B, C = P(30, 135), P(215, 135), P(150, 30)
+def side_label(p, q, s, out=12):
+    m = ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2); u = unit(p, q); n = (u[1], -u[0])
+    return text(m[0] + n[0] * out, m[1] + n[1] * out + 5, s, italic=True, acc=True)
+FIGS["1.9-A01"] = svg(245, 160, poly([A, B, C]) + text(A[0] - 8, A[1] + 5, "A", anchor="end") + text(B[0] + 8, B[1] + 5, "B", anchor="start")
+    + text(C[0], C[1] - 8, "C") + side_label(B, C, "a", -12) + side_label(C, A, "b", -12) + side_label(A, B, "c", -12))
+
+# 1.9-A02: area, two sides and the included angle C
+C, A, B = P(40, 130), P(150, 35), P(215, 130)
+FIGS["1.9-A02"] = svg(245, 155, poly([A, B, C]) + arc(C, 28, 0, ang(C, A), acc=True) + angle_label(C, 42, 0, ang(C, A), "C", italic=True, acc=True)
+    + text(C[0] - 8, C[1] + 5, "C", anchor="end") + text(A[0], A[1] - 8, "A") + text(B[0] + 8, B[1] + 5, "B", anchor="start")
+    + side_label(C, B, "a", -14) + side_label(A, C, "b", -14))
+
+# 1.9-C03: ambiguous case, two triangles from the same two sides and non-included angle
+A, B = P(25, 150), P(217, 150); t = 30; u = (math.cos(math.radians(t)), -math.sin(math.radians(t)))
+C1, C2 = add(A, u, 94.25), add(A, u, 238.35); R = 120
+a1, a2 = ang(B, C2) - 13, ang(B, C1) + 13
+x1, y1 = pt(B, R, a1); x2, y2 = pt(B, R, a2)
+FIGS["1.9-C03"] = svg(285, 175, line(A, B) + line(A, add(A, u, 268))
+    + f'<path d="M {f(x1)} {f(y1)} A {R} {R} 0 0 0 {f(x2)} {f(y2)}" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    + line(B, C1, acc=True) + line(B, C2, acc=True) + dot(C1) + dot(C2)
+    + arc(A, 30, 0, t) + text(A[0] - 8, A[1] + 5, "A", anchor="end") + text(B[0] + 8, B[1] + 5, "B", anchor="start")
+    + text(C1[0] - 6, C1[1] - 8, "C₁", anchor="end") + text(C2[0] - 8, C2[1] - 4, "C₂", anchor="end")
+    + text(121, 168, "c", italic=True) + side_label(C1, B, "a", 12) + side_label(B, C2, "a", 12))
+
+
+# 1.9-D01 / D02: which information calls for which rule (known parts in accent, "?" marks what is found)
+def given_triangle(dx, sides, angles, q_side=None, q_angle=None, caption=""):
+    V = [P(15 + dx, 108), P(135 + dx, 108), P(92 + dx, 22)]
+    out = ""
+    for i in range(3):
+        a, b = V[i], V[(i + 1) % 3]
+        out += line(a, b, acc=i in sides, w=3.2 if i in sides else 1.6)
+    for i in angles + ([q_angle] if q_angle is not None else []):
+        v, p1, p2 = V[i], V[(i + 1) % 3], V[(i + 2) % 3]
+        a1, a2 = ang(v, p1), ang(v, p2)
+        if (a2 - a1) % 360 > 180: a1, a2 = a2, a1
+        out += arc(v, 20, a1, a2, acc=i in angles, w=2.2 if i in angles else 1.4)
+        if i == q_angle: out += angle_label(v, 34, a1, a2, "?", size=13)
+    if q_side is not None:
+        a, b = V[q_side], V[(q_side + 1) % 3]
+        m = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2); u = unit(a, b); n = (u[1], -u[0])
+        out += text(m[0] - n[0] * 13, m[1] - n[1] * 13 + 5, "?", size=13)
+    return out + text(75 + dx, 132, caption, size=11)
+FIGS["1.9-D01"] = svg(340, 142, given_triangle(0, [0, 1, 2], [], q_angle=2, caption="three sides")
+    + given_triangle(185, [0, 2], [0], q_side=1, caption="two sides, included angle"))
+FIGS["1.9-D02"] = svg(340, 142, given_triangle(0, [0], [0, 1], q_side=1, caption="two angles, one side")
+    + given_triangle(185, [0, 1], [0], q_angle=2, caption="two sides, non-included angle"))
+
 if __name__ == "__main__":
     for name, s in FIGS.items():
         open(os.path.join(HERE, f"{name}.svg"), "w").write(s + "\n")
