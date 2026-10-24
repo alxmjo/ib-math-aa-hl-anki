@@ -10,6 +10,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 |---|---|---|
 | 1.4 | Equations | 15 |
 | 1.5 | Sequences and Series | 18 |
+| 1.6 | Measurement | 14 |
 
 Each chapter is a subdeck under **IB Math AA HL**. New chapters are added in later updates.
 
@@ -53,13 +54,14 @@ Importing never deletes cards. When a card is retired, the release notes give a 
 
 - Maths uses Anki's MathJax: `\( … \)` inline, `\[ … \]` display.
 - Card types: Rule and Strategy. The Why and any worked example go in Extra.
+- Cloze cards put the text with `{{c1::…}}` in the front column and leave the back empty. They use the separate "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
 - Subdeck titles are the code plus the chapter name (`IB Math AA HL::1.4 Equations`). The subdeck ID comes from the code alone, so a chapter can be renamed safely.
 - Tags: section code (`1.4C`) and `type::rule` or `type::strategy`. Note IDs: `1.4-C03`.
 - Preset: 10 new cards per day, siblings buried.
 
 ### Never change once students have the deck
 
-- `MODEL_ID` and `PRESET_ID` in `build_math_deck.py`.
+- `MODEL_ID`, `CLOZE_MODEL_ID` and `PRESET_ID` in `build_math_deck.py`.
 - A chapter's `--ref` code in `build.sh`.
 - Any card's `id` in a CSV. The note identity comes from the code and the card id, so edited cards update in place on re-import and students keep their progress.
 

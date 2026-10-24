@@ -7,4 +7,5 @@ mkdir -p dist
 
 python3 build_math_deck.py --out dist/IB_Math_AA_HL.apkg \
   --csv csv/1.4_equations.csv          --ref 1.4 --name "Equations" \
-  --csv csv/1.5_sequences_series.csv   --ref 1.5 --name "Sequences and Series"
+  --csv csv/1.5_sequences_series.csv   --ref 1.5 --name "Sequences and Series" \
+  --csv csv/1.6_measurement.csv        --ref 1.6 --name "Measurement"

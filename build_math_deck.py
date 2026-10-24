@@ -11,6 +11,8 @@ Tags, labels and note IDs use the code only: tag 1.4C, note ID 1.4-C03 (Browse s
 CSV columns: id, section, type, front, back, extra, tags, active
   type  = Rule | Strategy
   maths = \( ... \) inline, \[ ... \] display;  HTML allowed (<br>, <b>)
+Cloze cards: put the text with {{c1::...}} in the front column and leave back empty.
+  They use the "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
 """
 import argparse, csv, hashlib, json, os, shutil, sqlite3, zipfile
 import genanki
@@ -19,6 +21,7 @@ DECK_ROOT = "IB Math AA HL"
 NEW_PER_DAY = 10
 # ---------------- stable IDs (do not change) ----------------
 MODEL_ID = 1760000002101
+CLOZE_MODEL_ID = 1760000002102
 PRESET_ID = 1760000002301
 
 FIELDS = ["Front", "Back", "Extra", "Type", "Section", "ID"]
@@ -26,6 +29,12 @@ FRONT = ('<div class="meta"><span class="badge">{{Type}}</span> <span class="sec
          '<div class="q">{{Front}}</div>')
 BACK = ('{{FrontSide}}<hr id=answer><div class="a">{{Back}}</div>'
         '{{#Extra}}<div class="extra">{{Extra}}</div>{{/Extra}}')
+CLOZE_FIELDS = ["Text", "Extra", "Type", "Section", "ID"]
+CLOZE_FRONT = ('<div class="meta"><span class="badge">{{Type}}</span> <span class="sec">{{Section}}</span></div>'
+               '<div class="q">{{cloze:Text}}</div>')
+CLOZE_BACK = ('<div class="meta"><span class="badge">{{Type}}</span> <span class="sec">{{Section}}</span></div>'
+              '<div class="q">{{cloze:Text}}</div>'
+              '{{#Extra}}<div class="extra">{{Extra}}</div>{{/Extra}}')
 CSS = """.card{font-family:system-ui,-apple-system,sans-serif;font-size:20px;line-height:1.5;
 text-align:center;color:#222;background:#fff;padding:0 8px}
 .card.nightMode{color:#eee;background:#1e1e1e}
@@ -35,7 +44,9 @@ text-align:center;color:#222;background:#fff;padding:0 8px}
 .extra{font-size:15px;color:#666;margin-top:14px;padding-top:8px;border-top:1px dashed #ccc}
 .nightMode .extra{color:#aaa}
 .extra{text-align:left;display:inline-block;max-width:100%}
-mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}"""
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.cloze{font-weight:bold;color:#1a5fb4}
+.nightMode .cloze{color:#8ab4f8}"""
 
 
 def deck_id(name):
@@ -72,6 +83,9 @@ def main():
     model = genanki.Model(MODEL_ID, "IB Math card", fields=[{"name": f} for f in FIELDS],
                           templates=[{"name": "Card", "qfmt": FRONT, "afmt": BACK}],
                           css=CSS, sort_field_index=5)
+    cloze_model = genanki.Model(CLOZE_MODEL_ID, "IB Math cloze", fields=[{"name": f} for f in CLOZE_FIELDS],
+                                templates=[{"name": "Cloze", "qfmt": CLOZE_FRONT, "afmt": CLOZE_BACK}],
+                                css=CSS, sort_field_index=4, model_type=genanki.Model.CLOZE)
     root = genanki.Deck(deck_id(DECK_ROOT), DECK_ROOT)
     decks = [root]
     for path, ref, chapter in zip(a.csv, a.ref, a.name):
@@ -81,10 +95,16 @@ def main():
         for r in csv.DictReader(open(path, encoding="utf-8")):
             if r.get("active", "yes").strip().lower() == "no":
                 continue
-            d.add_note(genanki.Note(model=model, guid=genanki.guid_for(prefix, r["id"]),
-                fields=[r["front"], r["back"], r["extra"], r["type"],
-                        f'{ref}{r["section"]}', f'{prefix}-{r["id"]}'],
-                tags=r["tags"].split()))
+            guid = genanki.guid_for(prefix, r["id"])
+            label, card_id = f'{ref}{r["section"]}', f'{prefix}-{r["id"]}'
+            if "{{c1::" in r["front"]:
+                if r["back"].strip():
+                    raise SystemExit(f"{card_id}: a cloze card must leave the back column empty")
+                d.add_note(genanki.Note(model=cloze_model, guid=guid, tags=r["tags"].split(),
+                    fields=[r["front"], r["extra"], r["type"], label, card_id]))
+            else:
+                d.add_note(genanki.Note(model=model, guid=guid, tags=r["tags"].split(),
+                    fields=[r["front"], r["back"], r["extra"], r["type"], label, card_id]))
         decks.append(d)
         print(f"{name}: {len(d.notes)} cards")
     genanki.Package(decks).write_to_file(a.out)
