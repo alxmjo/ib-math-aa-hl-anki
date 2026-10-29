@@ -19,7 +19,17 @@ Each chapter is a subdeck under **IB Math AA HL**. New chapters are added in lat
 
 ## For students
 
-### Download
+### Install Anki
+
+Use the official Anki apps:
+
+- **Computer (Windows, Mac, Linux):** [Anki](https://apps.ankiweb.net/), free.
+- **Android:** [AnkiDroid](https://play.google.com/store/apps/details?id=com.ichi2.anki), free.
+- **iPhone or iPad:** [AnkiMobile](https://apps.apple.com/app/id373493387), paid.
+
+Other apps with "Anki" in their name are not compatible with this deck.
+
+### Download the deck
 
 **[Download the latest deck](https://github.com/alxmjo/ib-math-aa-hl-anki/releases/latest/download/IB_Math_AA_HL.apkg)**
 
