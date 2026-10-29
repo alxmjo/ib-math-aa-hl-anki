@@ -14,6 +14,9 @@ CSV columns: id, section, type, front, back, extra, tags, active
 Cloze cards: put the text with {{c1::...}} in the front column and leave back empty.
   They use the "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
 Figures: write [fig:NAME] in any field; the builder inlines figures/NAME.svg (see figures/make_figures.py).
+Quotes: quotes.csv (code, quote, author, source) gives each chapter subdeck one quote card, with the quote
+  on the front and the attribution on the back (Type "Quote", card ID 1.4-Q01, tag type::quote).
+  It is added first, so it is the first new card in its chapter. A chapter without a row gets no quote card.
 """
 import argparse, csv, hashlib, json, os, re, shutil, sqlite3, zipfile
 import genanki
@@ -55,6 +58,21 @@ mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
 
 
 FIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures")
+QUOTES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quotes.csv")
+
+
+QUOTE_ID = "Q01"  # one quote card per chapter; never change once published
+
+
+def load_quotes():
+    """(front, back) of each chapter's quote card, keyed by chapter code, from quotes.csv."""
+    if not os.path.exists(QUOTES):
+        return {}
+    out = {}
+    for r in csv.DictReader(open(QUOTES, encoding="utf-8")):
+        credit = r["author"] + (f", {r['source']}" if r["source"].strip() else "")
+        out[r["code"].strip()] = (f"“{r['quote'].strip()}”", f"— {credit}")
+    return out
 
 
 def with_figures(text, card_id):
@@ -105,10 +123,15 @@ def main():
                                 css=CSS, sort_field_index=4, model_type=genanki.Model.CLOZE)
     root = genanki.Deck(deck_id(DECK_ROOT), DECK_ROOT)
     decks = [root]
+    quotes = load_quotes()
     for path, ref, chapter in zip(a.csv, a.ref, a.name):
         name = f"{DECK_ROOT}::{ref} {chapter}"
         d = genanki.Deck(deck_id(f"{DECK_ROOT}::{ref}"), name)  # ID from the code only
         prefix = ref
+        if ref in quotes:  # added first so it is the chapter's first new card
+            front, back = quotes[ref]
+            d.add_note(genanki.Note(model=model, guid=genanki.guid_for(prefix, QUOTE_ID),
+                tags=[ref, "type::quote"], fields=[front, back, "", "Quote", ref, f"{prefix}-{QUOTE_ID}"]))
         for r in csv.DictReader(open(path, encoding="utf-8")):
             if r.get("active", "yes").strip().lower() == "no":
                 continue
