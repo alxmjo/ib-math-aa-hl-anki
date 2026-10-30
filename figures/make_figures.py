@@ -346,6 +346,104 @@ FIGS["1.9-D01"] = svg(340, 142, given_triangle(0, [0, 1, 2], [], q_angle=2, capt
 FIGS["1.9-D02"] = svg(340, 142, given_triangle(0, [0], [0, 1], q_side=1, caption="two angles, one side")
     + given_triangle(185, [0, 1], [0], q_angle=2, caption="two sides, non-included angle"))
 
+
+# ---------- Chapter 1.14 ----------
+def mk(ox, oy, s):
+    """Maths coordinates -> SVG coordinates, origin (ox, oy), s pixels per unit."""
+    return lambda x, y: (ox + s * x, oy - s * y)
+
+
+def curve(M, fn, x0, x1, n=60, acc=True, w=2.0):
+    pts = [M(x0 + (x1 - x0) * i / n, fn(x0 + (x1 - x0) * i / n)) for i in range(n + 1)]
+    return poly(pts, acc=acc, closed=False).replace('stroke-width="1.6"', f'stroke-width="{w}"')
+
+
+def xaxis(M, x0, x1, label=True):
+    a, b = M(x0, 0), M(x1, 0)
+    return line(a, b, w=1.2) + (text(b[0] + 4, b[1] + 5, "x", anchor="start", italic=True, size=13) if label else "")
+
+
+def tick_label(M, x, s, below=True, acc=False, size=13):
+    q = M(x, 0)
+    return line((q[0], q[1] - 4), (q[0], q[1] + 4), w=1.2) + text(q[0], q[1] + (18 if below else -9), s, italic=True, acc=acc, size=size)
+
+
+# 1.14-B01: sign of a, concave up (minimum) and concave down (maximum)
+M1, M2 = mk(65, 70, 22), mk(205, 70, 22)
+FIGS["1.14-B01"] = svg(280, 140, curve(M1, lambda x: x * x - 1.6, -1.95, 1.95) + dot(M1(0, -1.6), 3.2)
+    + text(M1(0, -1.6)[0], M1(0, -1.6)[1] + 17, "minimum", size=12)
+    + text(M1(0, 0)[0], 18, "a &gt; 0", italic=True, size=14, acc=True)
+    + curve(M2, lambda x: 1.6 - x * x, -1.95, 1.95) + dot(M2(0, 1.6), 3.2)
+    + text(M2(0, 1.6)[0], M2(0, 1.6)[1] - 9, "maximum", size=12)
+    + text(M2(0, 0)[0], 132, "a &lt; 0", italic=True, size=14, acc=True))
+
+# 1.14-B02: axis of symmetry midway between the x-intercepts p and q (tick marks: equal distances)
+M = mk(20, 62, 26)
+FIGS["1.14-B02"] = svg(250, 150, xaxis(M, 0, 8.3) + curve(M, lambda x: 0.35 * (x - 2) * (x - 6.5), 1.05, 7.45)
+    + ticks(M(2, 0), M(4.25, 0)) + ticks(M(4.25, 0), M(6.5, 0))
+    + line(M(4.25, 1.8), M(4.25, -2.6), acc=True, dash=True) + dot(M(2, 0)) + dot(M(6.5, 0))
+    + text(M(2, 0)[0] - 6, M(2, 0)[1] + 17, "p", italic=True, anchor="end", size=14)
+    + text(M(6.5, 0)[0] + 6, M(6.5, 0)[1] + 17, "q", italic=True, anchor="start", size=14)
+    + text(M(4.25, 0)[0], 143, "x = (p + q)/2", italic=True, acc=True, size=13))
+
+# 1.14-B03: vertex (h, k) of y = a(x - h)^2 + k
+M = mk(25, 125, 26)
+FIGS["1.14-B03"] = svg(250, 150, xaxis(M, 0, 8.1) + line(M(0, -0.6), M(0, 4.4), w=1.2)
+    + text(M(0, 4.4)[0] + 6, M(0, 4.4)[1] + 4, "y", italic=True, anchor="start", size=13)
+    + curve(M, lambda x: 0.75 * (x - 4.6) ** 2 + 1.5, 2.5, 6.7)
+    + line(M(4.6, 0), M(4.6, 4.6), acc=True, dash=True) + dot(M(4.6, 1.5), 3.2)
+    + text(M(4.6, 1.5)[0] + 10, M(4.6, 1.5)[1] + 16, "(h, k)", italic=True, anchor="start", acc=True, size=13)
+    + text(M(4.6, 4.6)[0] + 6, M(4.6, 4.6)[1] + 8, "x = h", italic=True, anchor="start", size=13))
+
+
+def three_panels(draw, captions, w=330, h=135):
+    out = ""
+    for i, (fn, cap) in enumerate(zip(draw, captions)):
+        cx = 55 + 110 * i
+        out += fn(mk(cx, 72, 18)) + text(cx, h - 4, cap, acc=True, size=19)
+    return svg(w, h, out)
+
+
+# 1.14-C01: discriminant and the x-axis, cuts / touches / misses
+FIGS["1.14-C01"] = three_panels([
+    lambda M: xaxis(M, -2.6, 2.6, False) + curve(M, lambda x: x * x - 1.8, -2.0, 2.0) + dot(M(-1.342, 0)) + dot(M(1.342, 0)),
+    lambda M: xaxis(M, -2.6, 2.6, False) + curve(M, lambda x: x * x, -1.55, 1.55) + dot(M(0, 0)),
+    lambda M: xaxis(M, -2.6, 2.6, False) + curve(M, lambda x: x * x + 0.9, -1.2, 1.2)],
+    ["Δ &gt; 0", "Δ = 0", "Δ &lt; 0"])
+
+# 1.14-C02 / C03: positive and negative definite
+M = mk(110, 105, 22)
+FIGS["1.14-C02"] = svg(240, 125, xaxis(M, -4.6, 4.6) + curve(M, lambda x: 0.6 * x * x + 0.8, -2.45, 2.45))
+M = mk(110, 25, 22)
+FIGS["1.14-C03"] = svg(240, 125, xaxis(M, -4.6, 4.6) + curve(M, lambda x: -0.6 * x * x - 0.8, -2.45, 2.45))
+
+# 1.14-E01: a line and a parabola, two points / tangent / no points
+def para_line(M, c):
+    pa = curve(M, lambda x: x * x - 0.5, -1.9, 1.9, acc=False, w=1.8)
+    ln = line(M(-2.4, 0.5 * -2.4 + c), M(2.4, 0.5 * 2.4 + c), acc=True, w=1.8)
+    return pa + ln
+def roots(c):  # x^2 - 0.5 = 0.5x + c
+    import math as _m
+    D = 0.25 + 4 * (0.5 + c)
+    return [] if D < -1e-9 else sorted({(0.5 + s * _m.sqrt(max(D, 0))) / 2 for s in (-1, 1)})
+FIGS["1.14-E01"] = three_panels([
+    lambda M, c=0.4: para_line(M, c) + "".join(dot(M(x, x * x - 0.5)) for x in roots(c)),
+    lambda M, c=-0.5625: para_line(M, c) + "".join(dot(M(x, x * x - 0.5)) for x in roots(c)),
+    lambda M, c=-1.7: para_line(M, c)],
+    ["Δ &gt; 0", "Δ = 0", "Δ &lt; 0"])
+
+# 1.14-H03: sign diagram of a(x - p)(x - q), a > 0
+M = mk(20, 62, 22)
+N = 128
+FIGS["1.14-H03"] = svg(250, 150, xaxis(M, 0, 9.6) + curve(M, lambda x: 0.42 * (x - 3) * (x - 6.8), 1.0, 8.8)
+    + dot(M(3, 0)) + dot(M(6.8, 0))
+    + line((M(0, 0)[0], N), (M(9.6, 0)[0], N), w=1.2) + text(M(9.6, 0)[0] + 4, N + 5, "x", anchor="start", italic=True, size=13)
+    + line(M(3, 0), (M(3, 0)[0], N), dash=True, w=1.0) + line(M(6.8, 0), (M(6.8, 0)[0], N), dash=True, w=1.0)
+    + text(M(1.4, 0)[0], N - 7, "+", acc=True, size=17) + text(M(4.9, 0)[0], N - 7, "−", acc=True, size=17)
+    + text(M(8.3, 0)[0], N - 7, "+", acc=True, size=17)
+    + text(M(3, 0)[0], N + 17, "p", italic=True, size=13) + text(M(6.8, 0)[0], N + 17, "q", italic=True, size=13))
+
+
 if __name__ == "__main__":
     for name, s in FIGS.items():
         open(os.path.join(HERE, f"{name}.svg"), "w").write(s + "\n")

@@ -14,6 +14,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 | 1.7 | Right Angled Triangle Trigonometry | 20 |
 | 1.8 | The Unit Circle and Radian Measure | 42 |
 | 1.9 | Non-Right Angled Triangle Trigonometry | 13 |
+| 1.14 | Quadratic Functions | 16 |
 
 Each chapter's count includes one quote card.
 
@@ -45,11 +46,17 @@ The link always gives the newest version. Might be worth bookmarking.
 
 If the import screen offers **Import any deck presets**, turn it on every time. This sets each chapter to 10 new cards per day, including chapters added in later updates. It never overwrites changes you have made to your own deck options.
 
-The cards appear under **IB Math AA HL**, with one subdeck per chapter.
+The cards appear under **IB Math AA HL**, with one subdeck per chapter. Subdeck titles write the chapter with two digits (1.04, 1.14) so that Anki lists the chapters in order.
 
 ### Updating
 
 When a new version is announced, download from the same link and import it the same way, with **Import any deck presets** turned on and the other import options at their defaults. Edited cards update in place and your review progress is kept.
+
+### Updating from a version without chapter 1.14
+
+Versions before chapter 1.14 named the subdecks 1.4 to 1.9; they are now 1.04 to 1.09. Anki matches subdecks by name, so rename yours once **before** importing: in the deck list, use the gear icon next to each subdeck and choose Rename, changing for example `1.4 Equations` to `1.04 Equations` (keep the rest of the name). Then import as usual.
+
+If you imported first, you will see two copies of a chapter, such as `1.4 Equations` and `1.04 Equations`. Delete the `1.04` copy (it holds only cards new in this version), rename the `1.4` copy to `1.04`, and import again.
 
 ### Removing retired cards
 
@@ -70,9 +77,11 @@ Importing never deletes cards. When a card is retired, the release notes give a 
 ### Conventions
 
 - Maths uses Anki's MathJax: `\( … \)` inline, `\[ … \]` display.
+- The builder keeps a short maths expression and the word attached to it on one line (`\(x\)-axis`, `\(n\)th`), so no markup is needed in the CSV.
 - Card types: Rule and Strategy. The Why and any worked example go in Extra.
 - Cloze cards put the text with `{{c1::…}}` in the front column and leave the back empty. They use the separate "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
-- Subdeck titles are the code plus the chapter name (`IB Math AA HL::1.4 Equations`). The subdeck ID comes from the code alone, so a chapter can be renamed safely.
+- Subdeck titles are the code, with the chapter zero-padded to two digits, plus the chapter name (`IB Math AA HL::1.04 Equations`), so Anki lists chapters in order. Only the title is padded: `--ref`, tags, labels and card IDs use the plain code (`1.4`, `1.4C`, `1.4-C03`).
+- Anki matches subdecks by **name** on import, not by deck ID. Renaming a subdeck that students already have puts new cards in a second deck, so students must rename their copy by hand before importing.
 - Tags: section code (`1.4C`) and `type::rule` or `type::strategy`. Note IDs: `1.4-C03`.
 - Preset: 10 new cards per day, siblings buried.
 
