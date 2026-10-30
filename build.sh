@@ -12,4 +12,5 @@ python3 build_math_deck.py --out dist/IB_Math_AA_HL.apkg \
   --csv csv/1.7_right_angled_trig.csv  --ref 1.7 --name "Right Angled Triangle Trigonometry" \
   --csv csv/1.8_unit_circle_radians.csv --ref 1.8 --name "The Unit Circle and Radian Measure" \
   --csv csv/1.9_non_right_trig.csv     --ref 1.9 --name "Non-Right Angled Triangle Trigonometry" \
-  --csv csv/1.14_quadratic_functions.csv --ref 1.14 --name "Quadratic Functions"
+  --csv csv/1.14_quadratic_functions.csv --ref 1.14 --name "Quadratic Functions" \
+  --csv csv/1.15_functions.csv         --ref 1.15 --name "Functions"

@@ -14,7 +14,8 @@ CSV columns: id, section, type, front, back, extra, tags, active
   maths = \( ... \) inline, \[ ... \] display;  HTML allowed (<br>, <b>)
 Cloze cards: put the text with {{c1::...}} in the front column and leave back empty.
   They use the "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
-Words attached to a short maths expression (\(x\)-axis, \(n\)th) are kept on one line automatically.
+Words attached to a short maths expression (\(x\)-axis, \(n\)th), and punctuation straight after
+  inline maths, are kept on one line automatically.
 Figures: write [fig:NAME] in any field; the builder inlines figures/NAME.svg (see figures/make_figures.py).
 Quotes: quotes.csv (code, quote, author, source) gives each chapter subdeck one quote card, with the quote
   on the front and the attribution on the back (Type "Quote", card ID 1.4-Q01, tag type::quote).
@@ -54,7 +55,7 @@ mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
 .cloze{font-weight:bold;color:#1a5fb4}
 .nightMode .cloze{color:#8ab4f8}
 .fig{margin:10px auto 4px;text-align:center}
-.fig svg{width:240px;max-width:100%;height:auto}
+.fig svg{width:480px;max-width:100%;height:auto}
 .nightMode .fig .acc{stroke:#8ab4f8}
 .nightMode .fig .acct{fill:#8ab4f8}"""
 
@@ -96,10 +97,15 @@ def title_code(ref):
 NOWRAP = re.compile(r"\\\([^\\]{1,12}\\\)-?[A-Za-z]+")
 
 
+PUNCT = re.compile(r"\\\((?:(?!\\\)).){1,80}\\\)[.,;:?!]")
+
+
 def keep_together(text):
     """Stop a line break between a short maths expression and the word attached to it,
-    as in \\(x\\)-axis or \\(n\\)th: the browser may otherwise break after the maths."""
-    return NOWRAP.sub(lambda m: f'<span style="white-space:nowrap">{m.group(0)}</span>', text)
+    as in \\(x\\)-axis or \\(n\\)th, and between inline maths and the punctuation after it,
+    as in \\(x \\gt 3\\).: the browser may otherwise break after the maths."""
+    span = lambda m: f'<span style="white-space:nowrap">{m.group(0)}</span>'
+    return NOWRAP.sub(span, PUNCT.sub(span, text))
 
 
 def deck_id(name):

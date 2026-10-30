@@ -444,6 +444,88 @@ FIGS["1.14-H03"] = svg(250, 150, xaxis(M, 0, 9.6) + curve(M, lambda x: 0.42 * (x
     + text(M(3, 0)[0], N + 17, "p", italic=True, size=13) + text(M(6.8, 0)[0], N + 17, "q", italic=True, size=13))
 
 
+# ---------- Chapter 1.15 ----------
+def yaxis(M, y0, y1, label=True):
+    a, b = M(0, y0), M(0, y1)
+    return line(a, b, w=1.2) + (text(b[0] + 6, b[1] + 4, "y", anchor="start", italic=True, size=13) if label else "")
+
+
+def dcurve(M, fn, x0, x1, n=60):
+    """Dashed, plain-colour curve (the part of a graph that is left out)."""
+    pts = [M(x0 + (x1 - x0) * i / n, fn(x0 + (x1 - x0) * i / n)) for i in range(n + 1)]
+    return poly(pts, closed=False, dash=True)
+
+
+def pcurve(M, pts_fn, t0, t1, n=60, acc=True):
+    """Parametric curve (x(t), y(t))."""
+    pts = [M(*pts_fn(t0 + (t1 - t0) * i / n)) for i in range(n + 1)]
+    return poly(pts, acc=acc, closed=False).replace('stroke-width="1.6"', 'stroke-width="2"')
+
+
+# 1.15-A01: vertical line test, a function (one meeting point) and a relation that is not (two)
+M1, M2 = mk(75, 72, 20), mk(225, 72, 20)
+FIGS["1.15-A01"] = svg(300, 150,
+    xaxis(M1, -2.8, 2.8, False) + yaxis(M1, -2.6, 2.6, False) + curve(M1, lambda x: 0.3 * x ** 3 - 0.2 * x + 0.3, -2.0, 2.0)
+    + line(M1(1.2, -2.7), M1(1.2, 2.7), dash=True, w=1.3) + dot(M1(1.2, 0.3 * 1.2 ** 3 - 0.24 + 0.3), 3.2)
+    + text(M1(0, 0)[0], 143, "function", size=13)
+    + xaxis(M2, -1.2, 3.6, False) + yaxis(M2, -2.6, 2.6, False) + pcurve(M2, lambda t: (0.55 * t * t, t), -2.3, 2.3)
+    + line(M2(1.8, -2.7), M2(1.8, 2.7), dash=True, w=1.3) + dot(M2(1.8, 1.809), 3.2) + dot(M2(1.8, -1.809), 3.2)
+    + text(M2(1.2, 0)[0], 143, "not a function", size=13))
+
+
+# 1.15-D01 / D02: y = (ax + b)/(cx + d), one asymptote highlighted in each
+def hyperbola(M):
+    g = lambda x: 1 + 2 / (x - 2)
+    return curve(M, g, 2.5, 8) + curve(M, g, -3, 1.6)
+M = mk(61, 100, 17)
+FIGS["1.15-D01"] = svg(250, 178, hyperbola(M)
+    + line(M(2, -4), M(2, 5.2), acc=True, dash=True) + line(M(-3, 1), M(8, 1), dash=True, w=1.0)
+    + text(M(2, 5.2)[0] - 7, M(2, 5.2)[1] + 12, "x = −d/c", anchor="end", italic=True, acc=True, size=13))
+FIGS["1.15-D02"] = svg(250, 178, hyperbola(M)
+    + line(M(-3, 1), M(8, 1), acc=True, dash=True) + line(M(2, -4), M(2, 5.2), dash=True, w=1.0)
+    + text(M(-3, 1)[0], M(-3, 1)[1] - 8, "y = a/c", anchor="start", italic=True, acc=True, size=13))
+
+
+# 1.15-F01: one-to-one, each vertical and each horizontal line meets the graph once
+M = mk(120, 75, 24)
+FIGS["1.15-F01"] = svg(240, 150, xaxis(M, -3.6, 3.6) + yaxis(M, -2.8, 2.8)
+    + curve(M, lambda x: 0.35 * x ** 3, -1.95, 1.95)
+    + line(M(-1.4, -2.9), M(-1.4, 2.9), dash=True, w=1.3) + dot(M(-1.4, 0.35 * -1.4 ** 3), 3.2)
+    + line(M(-3.6, 1.5), M(3.6, 1.5), dash=True, w=1.3) + dot(M(1.5 ** (1 / 3) / 0.35 ** (1 / 3), 1.5), 3.2))
+
+
+# 1.15-F03: horizontal line test, inverse exists (one meeting point) or not (two)
+M1, M2 = mk(75, 68, 20), mk(225, 105, 20)
+FIGS["1.15-F03"] = svg(300, 150,
+    xaxis(M1, -2.8, 2.8, False) + yaxis(M1, -2.4, 2.6, False) + curve(M1, lambda x: 0.35 * x ** 3, -1.8, 1.95)
+    + line(M1(-2.8, 1.2), M1(2.8, 1.2), dash=True, w=1.3) + dot(M1((1.2 / 0.35) ** (1 / 3), 1.2), 3.2)
+    + text(M1(0, 0)[0], 143, "inverse exists", size=13)
+    + xaxis(M2, -2.8, 2.8, False) + yaxis(M2, -0.6, 4.2, False) + curve(M2, lambda x: 0.8 * x * x, -2.2, 2.2)
+    + line(M2(-2.8, 2.0), M2(2.8, 2.0), dash=True, w=1.3) + dot(M2(-1.581, 2.0), 3.2) + dot(M2(1.581, 2.0), 3.2)
+    + text(M2(0, 0)[0], 143, "no inverse", size=13))
+
+
+# 1.15-F05: y = f(x) and y = f^-1(x), reflections of each other in y = x
+M = mk(66, 108, 20)
+FIGS["1.15-F05"] = svg(250, 185, xaxis(M, -2.8, 5.8) + yaxis(M, -3.4, 4.8)
+    + line(M(-2.8, -2.8), M(4.6, 4.6), dash=True, w=1.2)
+    + text(M(4.6, 4.6)[0] + 4, M(4.6, 4.6)[1] + 4, "y = x", anchor="start", italic=True, size=12)
+    + curve(M, lambda x: 2 ** x, -2.8, 2.0)
+    + pcurve(M, lambda t: (2 ** t, t), -2.8, 2.0, acc=False)
+    + text(M(-1.45, 1.35)[0], M(-1.45, 1.35)[1], "y = f(x)", italic=True, acc=True, size=12)
+    + text(M(4, 2)[0] + 6, M(4, 2)[1] + 4, "y = f⁻¹(x)", anchor="start", italic=True, size=12))
+
+
+# 1.15-F07: a quadratic restricted to x <= h passes the horizontal line test
+M = mk(30, 128, 22)
+q = lambda x: 0.6 * (x - 4) ** 2 + 0.8
+FIGS["1.15-F07"] = svg(250, 150, xaxis(M, -0.6, 9.2) + yaxis(M, -0.4, 5.0)
+    + curve(M, q, 1.3, 4) + dcurve(M, q, 4, 6.7) + dot(M(4, 0.8), 3.2)
+    + line(M(4, 0), M(4, 5.0), dash=True, w=1.0)
+    + text(M(4, 5.0)[0] + 6, M(4, 5.0)[1] + 8, "x = h", anchor="start", italic=True, size=13)
+    + text(M(2.65, 0)[0], M(2.65, 0)[1] + 17, "x ≤ h", italic=True, acc=True, size=13))
+
+
 if __name__ == "__main__":
     for name, s in FIGS.items():
         open(os.path.join(HERE, f"{name}.svg"), "w").write(s + "\n")

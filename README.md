@@ -15,6 +15,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 | 1.8 | The Unit Circle and Radian Measure | 42 |
 | 1.9 | Non-Right Angled Triangle Trigonometry | 13 |
 | 1.14 | Quadratic Functions | 16 |
+| 1.15 | Functions | 18 |
 
 Each chapter's count includes one quote card.
 
@@ -77,7 +78,7 @@ Importing never deletes cards. When a card is retired, the release notes give a 
 ### Conventions
 
 - Maths uses Anki's MathJax: `\( … \)` inline, `\[ … \]` display.
-- The builder keeps a short maths expression and the word attached to it on one line (`\(x\)-axis`, `\(n\)th`), so no markup is needed in the CSV.
+- The builder keeps a short maths expression and the word attached to it on one line (`\(x\)-axis`, `\(n\)th`), and keeps punctuation with the inline maths before it (`\(x \gt 3\).`), so no markup is needed in the CSV.
 - Card types: Rule and Strategy. The Why and any worked example go in Extra.
 - Cloze cards put the text with `{{c1::…}}` in the front column and leave the back empty. They use the separate "IB Math cloze" note type. Keep each cloze marker outside the maths delimiters.
 - Subdeck titles are the code, with the chapter zero-padded to two digits, plus the chapter name (`IB Math AA HL::1.04 Equations`), so Anki lists chapters in order. Only the title is padded: `--ref`, tags, labels and card IDs use the plain code (`1.4`, `1.4C`, `1.4-C03`).
