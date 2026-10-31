@@ -614,6 +614,134 @@ FIGS["1.16-E01"] = svg(290, 196, xaxis(M, -3.8, 6.4) + yaxis(M, -2.65, 2.65)
     + lab(M, 4.03, 2.6, "y = f(x)", dx=6, dy=6) + lab(M, 3.9, 1.1, "y = 1/f(x)", acc=True))
 
 
+# ---------------- 1.17 Trigonometric Functions ----------------
+PI = math.pi
+
+
+def mk2(ox, oy, sx, sy):
+    """Maths coordinates -> SVG coordinates, origin (ox, oy), sx and sy pixels per unit."""
+    return lambda x, y: (ox + sx * x, oy - sy * y)
+
+
+def darrow(p, q, head=6, w=1.2):
+    """Plain double-headed arrow from p to q (a measured distance)."""
+    u = unit(p, q); n = (-u[1], u[0]); out = line(add(p, u, head), add(q, u, -head), w=w)
+    for tip, d in ((p, 1), (q, -1)):
+        b = add(tip, u, d * head)
+        tri = [tip, add(b, n, head * 0.42), add(b, n, -head * 0.42)]
+        out += f'<polygon points="{" ".join(f"{f(x)},{f(y)}" for x, y in tri)}" fill="currentColor" stroke="none"/>'
+    return out
+
+
+def vtick(M, x, s, dx=0, below=True, acc=False):
+    """Tick on the horizontal axis at x with label s, nudged sideways by dx pixels to keep clear of the curve."""
+    q = M(x, 0)
+    return line((q[0], q[1] - 4), (q[0], q[1] + 4), w=1.2) + text(q[0] + dx, q[1] + (18 if below else -9), s, italic=True, acc=acc, size=13)
+
+
+def htick(M, y, s):
+    """Tick on the vertical axis at y with label s to its left."""
+    q = M(0, y)
+    return line((q[0] - 4, q[1]), (q[0] + 4, q[1]), w=1.2) + text(q[0] - 8, q[1] + 5, s, anchor="end", size=13)
+
+
+def acc_dot(p, r=3.4):
+    return f'<circle cx="{f(p[0])}" cy="{f(p[1])}" r="{r}" fill="{ACC}" class="acct"/>'
+
+
+def taxis(M, x0, x1, name="x"):
+    a, b = M(x0, 0), M(x1, 0)
+    return line(a, b, w=1.2) + text(b[0] + 4, b[1] + 5, name, anchor="start", italic=True, size=13)
+
+
+# 1.17-A01: a wave with its maximum, minimum, principal axis, amplitude and period
+M = mk2(22, 70, 28, 45)
+X1 = 2.5 * PI
+FIGS["1.17-A01"] = svg(330, 160, line(M(-0.3, 0), M(X1 + 0.9, 0), dash=True, w=1.2)
+    + curve(M, math.sin, 0, X1, n=120)
+    + dot(M(PI / 2, 1), 3.2) + dot(M(3 * PI / 2, -1), 3.2) + dot(M(X1, 1), 3.2)
+    + text(M(PI / 2, 1)[0], M(PI / 2, 1)[1] - 10, "maximum", size=12)
+    + text(M(3 * PI / 2, -1)[0], M(3 * PI / 2, -1)[1] + 16, "minimum", size=12)
+    + text(M(3 * PI / 2, 0)[0], M(3 * PI / 2, 0)[1] - 7, "principal axis", size=12)
+    + line(M(X1, 1), M(X1 + 0.9, 1), dash=True, w=1.0) + darrow(M(X1 + 0.6, 0), M(X1 + 0.6, 1))
+    + text(M(X1 + 0.6, 0.5)[0] + 6, M(X1 + 0.6, 0.5)[1] + 4, "amplitude", anchor="start", size=12)
+    + line(M(PI / 2, 1), M(PI / 2, -1.55), dash=True, w=1.0) + line(M(X1, 1), M(X1, -1.55), dash=True, w=1.0)
+    + darrow(M(PI / 2, -1.45), M(X1, -1.45))
+    + text(M(1.5 * PI, -1.45)[0], M(1.5 * PI, -1.45)[1] + 17, "period", size=12))
+
+# 1.17-B01: y = sin x on [0, 2pi], with the five quarter-period points
+M = mk2(30, 75, 30, 44)
+FIGS["1.17-B01"] = svg(280, 150, taxis(M, -0.35, 2 * PI + 0.55) + yaxis(M, -1.45, 1.45) + htick(M, 1, "1") + htick(M, -1, "−1")
+    + curve(M, math.sin, 0, 2 * PI, n=120)
+    + vtick(M, PI / 2, "π/2") + vtick(M, PI, "π", dx=-9) + vtick(M, 1.5 * PI, "3π/2", below=False) + vtick(M, 2 * PI, "2π", dx=10)
+    + "".join(acc_dot(M(k * PI / 2, math.sin(k * PI / 2))) for k in range(5))
+    + lab(M, 1.2 * PI, 0.75, "y = sin x", acc=True))
+
+# 1.17-B02: y = cos x on [0, 2pi], with the five quarter-period points
+FIGS["1.17-B02"] = svg(280, 150, taxis(M, -0.35, 2 * PI + 0.55) + yaxis(M, -1.45, 1.45) + htick(M, 1, "1") + htick(M, -1, "−1")
+    + curve(M, math.cos, 0, 2 * PI, n=120)
+    + vtick(M, PI / 2, "π/2", dx=-10) + vtick(M, PI, "π", below=False) + vtick(M, 1.5 * PI, "3π/2", dx=13) + vtick(M, 2 * PI, "2π")
+    + "".join(acc_dot(M(k * PI / 2, math.cos(k * PI / 2))) for k in range(5))
+    + lab(M, 1.5 * PI, -0.85, "y = cos x", acc=True, dx=12))
+
+# 1.17-C05: y = sin x is y = cos x translated pi/2 units to the right
+M = mk2(70, 84, 30, 44)
+FIGS["1.17-C05"] = svg(310, 152, taxis(M, -PI / 2 - 0.25, 2 * PI + 0.3) + yaxis(M, -1.35, 1.8)
+    + curve(M, math.cos, -PI / 2, 2 * PI, n=120, acc=False, w=1.6) + curve(M, math.sin, -PI / 2, 2 * PI, n=120)
+    + line(M(0, 1), M(0, 1.6), dash=True, w=1.0) + line(M(PI / 2, 1), M(PI / 2, 1.6), dash=True, w=1.0)
+    + arrow(M(0.05, 1.5), M(PI / 2 - 0.03, 1.5)) + lab(M, PI / 4, 1.5, "π/2", anchor="middle", acc=True, dy=15)
+    + vtick(M, PI / 2, "π/2", dx=-11) + vtick(M, PI, "π", below=False, dx=9) + vtick(M, 2 * PI, "2π", dx=10)
+    + lab(M, 2 * PI, 1, "y = cos x", anchor="middle", dy=-10)
+    + lab(M, 1.5 * PI, -1, "y = sin x", anchor="middle", acc=True, dy=18))
+
+
+# 1.17-D01 / E01: models y = a cos(b(t - c)) + d and y = a sin(b(t - c)) + d, a > 0, with c marked
+def model_axes(M, d, t1):
+    return (taxis(M, -0.3, t1, "t") + yaxis(M, -0.35, 3.85)
+            + line(M(0, d), M(t1 - 0.2, d), dash=True, w=1.0) + text(M(t1 - 0.2, d)[0] + 4, M(t1 - 0.2, d)[1] + 4, "y = d", anchor="start", italic=True, size=12))
+
+
+M = mk2(26, 128, 27, 30)
+D17, A17 = 2.0, 1.25
+cm = 2.4
+FIGS["1.17-D01"] = svg(285, 148, model_axes(M, D17, 8.6) + curve(M, lambda t: A17 * math.cos(t - cm) + D17, 0, 8.4, n=120)
+    + line(M(cm, A17 + D17), M(cm, 0), dash=True, w=1.0) + acc_dot(M(cm, A17 + D17))
+    + text(M(cm, A17 + D17)[0], M(cm, A17 + D17)[1] - 9, "maximum", size=12)
+    + vtick(M, cm, "c", acc=True))
+
+cs = 1.3
+FIGS["1.17-E01"] = svg(285, 160, model_axes(M, D17, 8.6) + curve(M, lambda t: A17 * math.sin(t - cs) + D17, 0, 8.4, n=120)
+    + line(M(cs, D17), M(cs, 0), dash=True, w=1.0) + acc_dot(M(cs, D17))
+    + line(M(cs, D17), M(cs, A17 + D17 + 0.55), dash=True, w=1.0) + line(M(cs + PI / 2, A17 + D17), M(cs + PI / 2, A17 + D17 + 0.55), dash=True, w=1.0)
+    + dot(M(cs + PI / 2, A17 + D17), 3.2)
+    + darrow(M(cs, A17 + D17 + 0.45), M(cs + PI / 2, A17 + D17 + 0.45))
+    + lab(M, cs + PI / 4, A17 + D17 + 0.45, "¼ period", anchor="middle", dy=-6)
+    + vtick(M, cs, "c", acc=True))
+
+# 1.17-F01: y = tan x, with its zeros and vertical asymptotes
+M = mk2(95, 76, 34, 24)
+FIGS["1.17-F01"] = svg(330, 155, taxis(M, -PI / 2 - 0.3, 3 * PI / 2 + 0.35) + yaxis(M, -2.9, 2.9)
+    + "".join(line(M(a, -2.9), M(a, 2.9), dash=True, w=1.0) for a in (-PI / 2, PI / 2, 3 * PI / 2))
+    + ccurve(M, lambda x: math.tan(x) if abs(math.cos(x)) > 1e-6 else None, -PI / 2, 3 * PI / 2, -2.6, 2.6, n=600)
+    + "".join(acc_dot(M(z, 0)) for z in (0, PI))
+    + vtick(M, -PI / 2, "−π/2", dx=-17) + vtick(M, PI / 2, "π/2", dx=-13) + vtick(M, 3 * PI / 2, "3π/2", dx=-17)
+    + vtick(M, PI, "π", dx=9) + lab(M, 3 * PI / 2, 2.4, "y = tan x", acc=True, dx=6))
+
+# 1.17-H01: where a model is above the line y = k (accent: the parts above, and the intervals of t)
+hh = lambda t: 1.35 * math.sin(0.95 * t) + 2.0
+kk = 2.75
+r1 = math.asin((kk - 2.0) / 1.35) / 0.95
+sols = [r1, (PI / 0.95) - r1, r1 + 2 * PI / 0.95, (PI / 0.95) - r1 + 2 * PI / 0.95]
+M = mk2(22, 128, 22, 30)
+FIGS["1.17-H01"] = svg(360, 158, taxis(M, -0.3, 13.6, "t") + yaxis(M, -0.35, 3.85)
+    + line(M(0, kk), M(13.3, kk), dash=True, w=1.0) + text(M(13.3, kk)[0] + 4, M(13.3, kk)[1] + 4, "y = k", anchor="start", italic=True, size=12)
+    + curve(M, hh, 0, 13.1, n=160, acc=False, w=1.6)
+    + curve(M, hh, sols[0], sols[1], n=40, w=2.6) + curve(M, hh, sols[2], sols[3], n=40, w=2.6)
+    + "".join(line(M(s, kk), M(s, 0), dash=True, w=1.0) for s in sols)
+    + line(M(sols[0], 0), M(sols[1], 0), acc=True, w=4) + line(M(sols[2], 0), M(sols[3], 0), acc=True, w=4)
+    + "".join(lab(M, s, 0, f"t<tspan baseline-shift=\"sub\" font-size=\"9\">{i + 1}</tspan>", anchor="middle", dy=18) for i, s in enumerate(sols)))
+
+
 if __name__ == "__main__":
     for name, s in FIGS.items():
         open(os.path.join(HERE, f"{name}.svg"), "w").write(s + "\n")
