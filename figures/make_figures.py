@@ -526,6 +526,94 @@ FIGS["1.15-F07"] = svg(250, 150, xaxis(M, -0.6, 9.2) + yaxis(M, -0.4, 5.0)
     + text(M(2.65, 0)[0], M(2.65, 0)[1] + 17, "x ≤ h", italic=True, acc=True, size=13))
 
 
+
+# ---------- Chapter 1.16 ----------
+def arrow(p, q, head=7, w=1.6):
+    """Accent arrow from p to q, with a filled head at q."""
+    u = unit(p, q); n = (-u[1], u[0]); b = add(q, u, -head)
+    tri = [q, add(b, n, head * 0.45), add(b, n, -head * 0.45)]
+    d = " ".join(f"{f(x)},{f(y)}" for x, y in tri)
+    return line(p, b, acc=True, w=w) + f'<polygon points="{d}" fill="{ACC}" stroke="none" class="acct"/>'
+
+
+def ccurve(M, fn, x0, x1, y0, y1, n=240, acc=True, w=2.0):
+    """Curve clipped to y0 <= y <= y1, split into pieces where it leaves that band."""
+    out, seg = "", []
+    for i in range(n + 1):
+        x = x0 + (x1 - x0) * i / n; y = fn(x)
+        if y is not None and y0 <= y <= y1:
+            seg.append(M(x, y))
+        else:
+            if len(seg) > 1: out += poly(seg, acc=acc, closed=False).replace('stroke-width="1.6"', f'stroke-width="{w}"')
+            seg = []
+    if len(seg) > 1: out += poly(seg, acc=acc, closed=False).replace('stroke-width="1.6"', f'stroke-width="{w}"')
+    return out
+
+
+def lab(M, x, y, s, anchor="start", acc=False, dx=0, dy=0):
+    q = M(x, y)
+    return text(q[0] + dx, q[1] + dy, s, anchor=anchor, italic=True, acc=acc, size=13)
+
+
+g16 = lambda x: 0.25 * (x + 2) * (x - 1) * (x - 3)   # base graph y = f(x)
+XMAX16, XMIN16 = -0.7863, 2.1196                     # its local maximum and minimum
+plain16 = lambda M, x0=-2.3, x1=3.4: curve(M, g16, x0, x1, acc=False, w=1.6)
+
+# 1.16-A01: vertical translation y = f(x) + b
+M = mk(70, 112, 22)
+FIGS["1.16-A01"] = svg(250, 160, xaxis(M, -2.9, 7.0) + yaxis(M, -1.9, 3.9) + plain16(M)
+    + curve(M, lambda x: g16(x) + 1.5, -2.3, 3.4)
+    + arrow(M(XMAX16, g16(XMAX16)), M(XMAX16, g16(XMAX16) + 1.5)) + lab(M, XMAX16, g16(XMAX16) + 0.75, "b", acc=True, dx=6, dy=5)
+    + lab(M, 3.4, g16(3.4), "y = f(x)", dx=6, dy=8) + lab(M, 3.4, g16(3.4) + 1.5, "y = f(x) + b", acc=True, dx=6, dy=4))
+
+# 1.16-A02: horizontal translation y = f(x - a)
+M = mk(100, 70, 21)
+FIGS["1.16-A02"] = svg(310, 125, xaxis(M, -3.2, 8.6) + yaxis(M, -1.9, 2.6) + plain16(M)
+    + curve(M, lambda x: g16(x - 2), -0.3, 5.4)
+    + arrow(M(XMIN16, g16(XMIN16)), M(XMIN16 + 2, g16(XMIN16))) + lab(M, XMIN16 + 1, g16(XMIN16), "a", acc=True, anchor="middle", dy=16)
+    + lab(M, XMAX16, g16(XMAX16), "y = f(x)", anchor="end", dx=-10, dy=2) + lab(M, 5.4, g16(3.4), "y = f(x − a)", acc=True, dx=6, dy=4))
+
+# 1.16-B01: vertical stretch y = p f(x); the x-intercepts do not move
+M = mk(62, 100, 20)
+FIGS["1.16-B01"] = svg(260, 160, xaxis(M, -2.7, 8.9) + yaxis(M, -2.6, 4.5) + plain16(M, -2.2, 3.35)
+    + curve(M, lambda x: 2 * g16(x), -2.2, 3.35)
+    + arrow(M(XMAX16, g16(XMAX16)), M(XMAX16, 2 * g16(XMAX16)))
+    + dot(M(-2, 0), 3.2) + dot(M(1, 0), 3.2) + dot(M(3, 0), 3.2)
+    + lab(M, 3.35, g16(3.35), "y = f(x)", dx=6, dy=10) + lab(M, 3.35, 2 * g16(3.35), "y = p f(x)", acc=True, dx=6, dy=4))
+
+# 1.16-B02: horizontal stretch y = f(qx), q > 1; the y-intercept does not move
+M = mk(120, 80, 22)
+FIGS["1.16-B02"] = svg(300, 145, xaxis(M, -3.0, 7.2) + yaxis(M, -2.2, 2.7) + plain16(M)
+    + curve(M, lambda x: g16(2 * x), -1.15, 1.7)
+    + arrow(M(XMIN16, g16(XMIN16)), M(XMIN16 / 2, g16(XMIN16)))
+    + dot(M(0, 1.5), 3.2)
+    + lab(M, 3.4, g16(3.4), "y = f(x)", dx=6, dy=4) + lab(M, -0.393, 2.05, "y = f(qx)", acc=True, anchor="end", dx=-8, dy=-8))
+
+# 1.16-C01: reflection in the x-axis y = -f(x)
+M = mk(62, 75, 22)
+FIGS["1.16-C01"] = svg(255, 150, xaxis(M, -2.6, 7.5) + yaxis(M, -2.9, 2.9) + plain16(M)
+    + curve(M, lambda x: -g16(x), -2.3, 3.4)
+    + lab(M, 3.4, g16(3.4), "y = f(x)", dx=6, dy=4) + lab(M, 3.4, -g16(3.4), "y = −f(x)", acc=True, dx=6, dy=8))
+
+# 1.16-C02: reflection in the y-axis y = f(-x)
+M = mk(150, 78, 21)
+FIGS["1.16-C02"] = svg(300, 150, xaxis(M, -5.4, 5.4) + yaxis(M, -2.6, 3.0) + plain16(M)
+    + curve(M, lambda x: g16(-x), -3.4, 2.3)
+    + lab(M, 3.4, g16(3.4), "y = f(x)", dx=6, dy=4) + lab(M, -3.4, g16(3.4), "y = f(−x)", acc=True, anchor="end", dx=-6, dy=4))
+
+# 1.16-E01: y = f(x) and y = 1/f(x); zeros become vertical asymptotes, the minimum becomes a maximum
+# (taller vertical scale, so the two turning points and their labels are well separated)
+h16 = lambda x: 0.5 * (x + 1) * (x - 3)
+M = lambda x, y: (110 + 26 * x, 100 - 34 * y)
+FIGS["1.16-E01"] = svg(290, 196, xaxis(M, -3.8, 6.4) + yaxis(M, -2.65, 2.65)
+    + line(M(-1, -2.65), M(-1, 2.65), dash=True, w=1.0) + line(M(3, -2.65), M(3, 2.65), dash=True, w=1.0)
+    + curve(M, h16, -2.03, 4.03, acc=False, w=1.6)
+    + ccurve(M, lambda x: 1 / h16(x) if abs(h16(x)) > 1e-9 else None, -3.8, 6.2, -2.6, 2.6)
+    + dot(M(1, -2), 3.2) + dot(M(1, -0.5), 3.2)
+    + lab(M, 1, -2, "(1, −2)", anchor="middle", dy=18) + lab(M, 1, 0, "(1, −½)", acc=True, anchor="middle", dx=8, dy=-6)
+    + lab(M, 4.03, 2.6, "y = f(x)", dx=6, dy=6) + lab(M, 3.9, 1.1, "y = 1/f(x)", acc=True))
+
+
 if __name__ == "__main__":
     for name, s in FIGS.items():
         open(os.path.join(HERE, f"{name}.svg"), "w").write(s + "\n")

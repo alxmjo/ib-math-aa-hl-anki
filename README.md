@@ -16,6 +16,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 | 1.9 | Non-Right Angled Triangle Trigonometry | 13 |
 | 1.14 | Quadratic Functions | 16 |
 | 1.15 | Functions | 18 |
+| 1.16 | Transformations of Functions | 20 |
 
 Each chapter's count includes one quote card.
 
