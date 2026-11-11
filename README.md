@@ -12,7 +12,7 @@ The deck currently covers these textbook chapters. The code gives the book and c
 | 1.5 | Sequences and Series | 19 |
 | 1.6 | Measurement | 15 |
 | 1.7 | Right Angled Triangle Trigonometry | 20 |
-| 1.8 | The Unit Circle and Radian Measure | 42 |
+| 1.8 | The Unit Circle and Radian Measure | 43 |
 | 1.9 | Non-Right Angled Triangle Trigonometry | 13 |
 | 1.14 | Quadratic Functions | 16 |
 | 1.15 | Functions | 18 |

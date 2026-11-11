@@ -294,6 +294,13 @@ FIGS["1.8-G01"] = svg(260, 170, line(P(15, 125), P(245, 125), w=1.2) + line(P(55
     + arc(X, 24, 0, t, acc=True) + angle_label(X, 38, 0, t, "θ", italic=True, acc=True)
     + text(140, 142, "run", size=12) + text(191, 125 - 45 * m + 4, "rise", anchor="start", size=12))
 
+# 1.8-G02: a line with negative gradient makes an obtuse angle θ with the positive x-axis
+X = P(150, 125); t = 130; m = math.tan(math.radians(t))
+FIGS["1.8-G02"] = svg(260, 170, line(P(15, 125), P(245, 125), w=1.2) + line(P(55, 160), P(55, 15), w=1.2)
+    + text(248, 130, "x", anchor="start", italic=True, size=13) + text(61, 19, "y", anchor="start", italic=True, size=13)
+    + line(add(X, (1, -m), 28 / abs(m)), add(X, (-1, m), 92 / abs(m)), acc=True)
+    + arc(X, 22, 0, t, acc=True) + angle_label(X, 37, 0, t, "θ", italic=True, acc=True))
+
 
 # ---------- Chapter 1.9 ----------
 # 1.9-A01: labelling convention, side a opposite angle A
